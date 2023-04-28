@@ -23,7 +23,11 @@ class _MainPageState extends State<MainPage> {
       _workWidget('Ania', 'Stęzycka 62/18', 230.50, '12:00', 'Gdańsk', 'todo',
           DateTime(2023, 04, 2023)),
       _workWidget('Dawid', 'Berki 3/24', 1000, '15:00', 'Białogard', 'done',
-          DateTime(2023, 04, 26))
+          DateTime(2023, 04, 26)),
+      _workWidget('Dawid', 'Berki 3/24', 1000, '15:00', 'Białogard', 'done',
+          DateTime(2023, 04, 26)),
+      _workWidget('Dawid', 'Berki 3/24', 1000, '15:00', 'Białogard', 'done',
+          DateTime(2023, 04, 26)),
     ];
 
     return Scaffold(
@@ -32,7 +36,9 @@ class _MainPageState extends State<MainPage> {
           Icons.add,
           color: Colors.white,
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, 'add_work');
+        },
       ),
       body: Container(
         height: _deviceHeight,
@@ -54,8 +60,14 @@ class _MainPageState extends State<MainPage> {
                 _mapButton(),
               ],
             ),
-            work[0],
-            work[1],
+            Expanded(
+              child: ListView.builder(
+                itemCount: work.length,
+                itemBuilder: (context, index) {
+                  return work[index];
+                },
+              ),
+            )
           ],
         ),
       ),
