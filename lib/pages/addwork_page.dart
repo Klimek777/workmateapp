@@ -4,6 +4,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
+
+import '../services/firebase_service.dart';
 
 class AddWrok extends StatefulWidget {
   const AddWrok({super.key});
@@ -22,25 +27,38 @@ class Service {
     this.quantityController,
     this.priceController,
   });
+
+  @override
+  String toString() {
+    return serviceNameController!.text + ' x ' + quantityController!.text;
+  }
 }
 
 class _AddWrokState extends State<AddWrok> {
   // ignore: unused_field
   double? _deviceHeight, _deviceWidth, _price, _totalSum;
   // ignore: unused_field
-  String? _name, _phone, _address, _serviceName;
+  String? _name, _phone, _city, _address, _notes, _serviceName;
   int? _q;
   List<Widget> _serviceWidgets = [];
-  final _serviceNameController = TextEditingController();
-  final _quantityController = TextEditingController();
-  final _priceController = TextEditingController();
+  TextEditingController _serviceNameController = TextEditingController();
+  TextEditingController _quantityController = TextEditingController();
+  TextEditingController _priceController = TextEditingController();
+  TextEditingController _dateController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
+
+  FirebaseService? _firebaseService;
+  final GlobalKey<FormState> _workFormKey = GlobalKey<FormState>();
+
   late List<Service> _serviceList;
   StreamController<Service> _serviceController = StreamController.broadcast();
 
   @override
   void initState() {
     super.initState();
-    _serviceList = []; // <- utworzenie pustej listy w metodzie initState
+    _firebaseService = GetIt.instance.get<FirebaseService>();
+    _serviceList = [];
+    _dateController.text = "";
   }
 
   Widget build(BuildContext context) {
@@ -55,10 +73,7 @@ class _AddWrokState extends State<AddWrok> {
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.max,
-              children: [
-                _headWidget(),
-                _formWidget(),
-              ],
+              children: [_headWidget(), _formWidget(), _saveButton()],
             ),
           ),
         ),
@@ -92,49 +107,63 @@ class _AddWrokState extends State<AddWrok> {
   Widget _formWidget() {
     return Padding(
       padding: const EdgeInsets.only(right: 30, left: 30),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            'Personal Information',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          _nameTextField(),
-          SizedBox(
-            height: 10,
-          ),
-          _phoneTextField(),
-          SizedBox(
-            height: 10,
-          ),
-          _adressTextField(),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            'Product',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          _serviceListWidget(),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            'Notes',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          _notesWidget(),
-          SizedBox(
-            height: 10,
-          ),
-          _sumWidget(_totalSum)
-        ],
+      child: Form(
+        key: _workFormKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'Personal Information',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            _nameTextField(),
+            SizedBox(
+              height: 10,
+            ),
+            _phoneTextField(),
+            SizedBox(
+              height: 10,
+            ),
+            _adressTextField(),
+            SizedBox(
+              height: 10,
+            ),
+            _cityTextField(),
+            SizedBox(
+              height: 10,
+            ),
+            _dateTextField(),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              'Product',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            _serviceListWidget(),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Notes',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            _notesWidget(),
+            SizedBox(
+              height: 10,
+            ),
+            _sumWidget(_totalSum),
+            SizedBox(
+              height: 10,
+            )
+          ],
+        ),
       ),
     );
   }
@@ -166,6 +195,11 @@ class _AddWrokState extends State<AddWrok> {
 
   Widget _phoneTextField() {
     return TextFormField(
+      controller: _phoneController,
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+      ],
+      keyboardType: TextInputType.number,
       decoration: const InputDecoration(
         hintText: "Phone number...",
         enabledBorder: OutlineInputBorder(
@@ -181,6 +215,22 @@ class _AddWrokState extends State<AddWrok> {
           ),
         ),
       ),
+      onChanged: (value) {
+        final number = int.tryParse(value.replaceAll(' ', ''));
+        if (number != null) {
+          final formatter = NumberFormat('# ###');
+          final newText = formatter.format(number);
+          final regex = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+          final formattedText =
+              newText.replaceAllMapped(regex, (Match m) => '${m[1]} ');
+          if (formattedText != value) {
+            _phoneController.value = TextEditingValue(
+              text: formattedText,
+              selection: TextSelection.collapsed(offset: formattedText.length),
+            );
+          }
+        }
+      },
       onSaved: (_value) {
         setState(() {
           _phone = _value;
@@ -214,9 +264,76 @@ class _AddWrokState extends State<AddWrok> {
     );
   }
 
-  // Widget _datePickWidget(){
+  Widget _cityTextField() {
+    return TextFormField(
+      decoration: const InputDecoration(
+        hintText: "City...",
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(width: 2, color: Colors.orange),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(width: 2, color: Colors.orange),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
+      ),
+      onSaved: (_value) {
+        setState(() {
+          _city = _value;
+        });
+      },
+    );
+  }
 
-  // }
+  Widget _dateTextField() {
+    return TextField(
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(), //get today's date
+            firstDate: DateTime(
+                2000), //DateTime.now() - not to allow to choose before today.
+            lastDate: DateTime(2101));
+        if (pickedDate != null) {
+          print(
+              pickedDate); //get the picked date in the format => 2022-07-04 00:00:00.000
+          String formattedDate = DateFormat('yyyy-MM-dd').format(
+              pickedDate); // format date in required form here we use yyyy-MM-dd that means time is removed
+          print(
+              formattedDate); //formatted date output using intl package =>  2022-07-04
+          //You can format date as per your need
+
+          setState(() {
+            _dateController.text =
+                formattedDate; //set foratted date to TextField value.
+          });
+        } else {
+          print("Date is not selected");
+        }
+      },
+      readOnly: true,
+      controller: _dateController,
+      decoration: const InputDecoration(
+        hintText: "Enter Date",
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(width: 2, color: Colors.orange),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(width: 2, color: Colors.orange),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _serviceWidget({int? index, required Service service}) {
     return Row(
@@ -263,7 +380,7 @@ class _AddWrokState extends State<AddWrok> {
                 }
               });
             },
-            icon: Icon(Icons.delete))
+            icon: Icon(Icons.close))
       ],
     );
   }
@@ -279,10 +396,20 @@ class _AddWrokState extends State<AddWrok> {
           SizedBox(height: 10),
         ], // wyświetl istniejące widgety
         SizedBox(height: 10),
-        ElevatedButton(
-          child: Text(
-            'Add Product',
-            style: TextStyle(color: Colors.white),
+        MaterialButton(
+          child: Container(
+            width: 120,
+            height: 30,
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: Center(
+              child: Text(
+                'Add Product',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ),
           onPressed: () {
             setState(() {
@@ -300,28 +427,32 @@ class _AddWrokState extends State<AddWrok> {
   }
 
   Widget _notesWidget() {
-    return TextField(
-      decoration: InputDecoration(
-        isDense: true,
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(color: Colors.orange, width: 2.0),
+    return TextFormField(
+        decoration: InputDecoration(
+          isDense: true,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.orange, width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.orange, width: 2.0),
+          ),
+          border: OutlineInputBorder(),
+          labelStyle: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              letterSpacing: 2.0),
+          hintText: 'Make some notes about your customer',
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(color: Colors.orange, width: 2.0),
-        ),
-        border: OutlineInputBorder(),
-        labelStyle: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 2.0),
-        hintText: 'Make some notes about your customer',
-      ),
-      keyboardType: TextInputType.multiline,
-      minLines: 2,
-      maxLines: 11,
-    );
+        keyboardType: TextInputType.multiline,
+        minLines: 2,
+        maxLines: 11,
+        onSaved: (_value) {
+          setState(() {
+            _notes = _value;
+          });
+        });
   }
 
   void _calculateFinalSum() {
@@ -341,5 +472,44 @@ class _AddWrokState extends State<AddWrok> {
 
   Widget _sumWidget(double? finalSum) {
     return Text('SUM = ' + _totalSum.toString() + ' pln');
+  }
+
+  Widget _saveButton() {
+    return MaterialButton(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.orange,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Center(
+              child: Text(
+            'Save',
+            style: TextStyle(color: Colors.white),
+          )),
+          width: 60,
+          height: 30,
+        ),
+        onPressed: () async {
+          _postWork();
+        });
+  }
+
+  void _postWork() async {
+    _workFormKey.currentState!.save();
+    try {
+      await _firebaseService!.postWork(
+          _name!,
+          _phone!,
+          _address!,
+          _city!,
+          _dateController.text,
+          _serviceList.toString(),
+          _notes,
+          _totalSum.toString(),
+          'todo');
+      Navigator.pop(context);
+    } catch (e) {
+      print(e);
+    }
   }
 }

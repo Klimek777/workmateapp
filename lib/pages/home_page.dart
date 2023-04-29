@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workmateapp/pages/charts_page.dart';
 import 'package:workmateapp/pages/main_page.dart';
-import 'package:workmateapp/pages/schedule_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,7 +13,7 @@ class _HomePageState extends State<HomePage> {
   double? _deviceHeight, _deviceWidth;
   int _currentPage = 0;
 
-  final List<Widget> _pages = [MainPage(), SchedulePage(), ChartsPage()];
+  final List<Widget> _pages = [MainPage(), ChartsPage()];
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +38,12 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.home),
         ),
         BottomNavigationBarItem(
-          label: 'Schedule',
-          icon: Icon(Icons.calendar_month),
-        ),
-        BottomNavigationBarItem(
           label: 'Charts',
           icon: Icon(Icons.insights),
+        ),
+        BottomNavigationBarItem(
+          label: 'Profile',
+          icon: Icon(Icons.person),
         ),
       ],
     );

@@ -9,6 +9,7 @@ class FirebaseService {
   FirebaseFirestore _db = FirebaseFirestore.instance;
 
   final String USER_COLLECTION = 'users';
+  final String WORK_COLLECTION = 'work';
   Map? currentUser;
 
   FirebaseService();
@@ -57,5 +58,37 @@ class FirebaseService {
     DocumentSnapshot? _doc =
         await _db.collection(USER_COLLECTION).doc(uid).get();
     return _doc.data() as Map;
+  }
+
+  Future<bool> postWork(
+    String name,
+    String phone,
+    String address,
+    String city,
+    String date,
+    String? product,
+    String? notes,
+    String sum,
+    String status,
+  ) async {
+    try {
+      String _userId = _auth.currentUser!.uid;
+      await _db.collection(WORK_COLLECTION).add({
+        "userId": _userId,
+        "name": name,
+        "phone": phone,
+        "address": address,
+        "city": city,
+        "date": date,
+        "product": product,
+        "notes": notes,
+        "sum": sum,
+        "status": status,
+      });
+
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
