@@ -1,16 +1,9 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers, unused_local_variable
+
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-
-class Product {
-  String name;
-  int quantity;
-  double price;
-
-  Product({required this.name, required this.quantity, required this.price});
-
-  double getTotalPrice() {
-    return quantity * price;
-  }
-}
 
 class AddWrok extends StatefulWidget {
   const AddWrok({super.key});
@@ -19,29 +12,44 @@ class AddWrok extends StatefulWidget {
   State<AddWrok> createState() => _AddWrokState();
 }
 
+class Service {
+  TextEditingController? serviceNameController;
+  TextEditingController? quantityController;
+  TextEditingController? priceController;
+
+  Service({
+    this.serviceNameController,
+    this.quantityController,
+    this.priceController,
+  });
+}
+
 class _AddWrokState extends State<AddWrok> {
-  double? _deviceHeight, _deviceWidth, _price;
+  // ignore: unused_field
+  double? _deviceHeight, _deviceWidth, _price, _totalSum;
+  // ignore: unused_field
   String? _name, _phone, _address, _serviceName;
   int? _q;
   List<Widget> _serviceWidgets = [];
-  List<Product> _products = [];
-
-  double getTotalOrderPrice() {
-    double total = 0.0;
-    for (Product product in _products) {
-      total += product.getTotalPrice();
-    }
-    return total;
-  }
+  final _serviceNameController = TextEditingController();
+  final _quantityController = TextEditingController();
+  final _priceController = TextEditingController();
+  late List<Service> _serviceList;
+  StreamController<Service> _serviceController = StreamController.broadcast();
 
   @override
+  void initState() {
+    super.initState();
+    _serviceList = []; // <- utworzenie pustej listy w metodzie initState
+  }
+
   Widget build(BuildContext context) {
     _deviceHeight = MediaQuery.of(context).size.height;
     _deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: SafeArea(
-        child: Container(
+        child: SizedBox(
           width: _deviceWidth,
           height: _deviceHeight,
           child: SingleChildScrollView(
@@ -121,7 +129,11 @@ class _AddWrokState extends State<AddWrok> {
           SizedBox(
             height: 10,
           ),
-          _notesWidget()
+          _notesWidget(),
+          SizedBox(
+            height: 10,
+          ),
+          _sumWidget(_totalSum)
         ],
       ),
     );
@@ -206,12 +218,13 @@ class _AddWrokState extends State<AddWrok> {
 
   // }
 
-  Widget _addServiceWidget({int? index}) {
+  Widget _serviceWidget({int? index, required Service service}) {
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: TextField(
+            controller: service.serviceNameController,
             decoration: InputDecoration(
               hintText: 'Product name',
             ),
@@ -220,6 +233,8 @@ class _AddWrokState extends State<AddWrok> {
         SizedBox(width: 10),
         Expanded(
           child: TextField(
+            onChanged: ((value) => _calculateFinalSum()),
+            controller: service.quantityController,
             decoration: InputDecoration(
               hintText: 'Qty',
             ),
@@ -228,6 +243,8 @@ class _AddWrokState extends State<AddWrok> {
         SizedBox(width: 10),
         Expanded(
           child: TextField(
+            onChanged: (value) => _calculateFinalSum(),
+            controller: service.priceController,
             decoration: InputDecoration(
               hintText: 'Price',
             ),
@@ -240,7 +257,8 @@ class _AddWrokState extends State<AddWrok> {
             onPressed: () {
               setState(() {
                 if (index != null) {
-                  _serviceWidgets.removeAt(index);
+                  _serviceList.removeAt(index);
+                  _calculateFinalSum();
                   print('deleted index: $index');
                 }
               });
@@ -253,8 +271,11 @@ class _AddWrokState extends State<AddWrok> {
   Widget _serviceListWidget() {
     return Column(
       children: [
-        for (int i = 0; i < _serviceWidgets.length; i++) ...[
-          _addServiceWidget(index: i),
+        for (int i = 0; i < _serviceList.length; i++) ...[
+          _serviceWidget(
+            index: i,
+            service: _serviceList[i],
+          ),
           SizedBox(height: 10),
         ], // wyświetl istniejące widgety
         SizedBox(height: 10),
@@ -265,8 +286,12 @@ class _AddWrokState extends State<AddWrok> {
           ),
           onPressed: () {
             setState(() {
-              _serviceWidgets
-                  .add(_addServiceWidget()); // dodaj nowy widget do listy
+              _serviceList.add(Service(
+                  serviceNameController: TextEditingController(),
+                  quantityController: TextEditingController(),
+                  priceController: TextEditingController()));
+              _calculateFinalSum();
+              // dodaj nowy widget do listy
             });
           },
         ),
@@ -297,5 +322,24 @@ class _AddWrokState extends State<AddWrok> {
       minLines: 2,
       maxLines: 11,
     );
+  }
+
+  void _calculateFinalSum() {
+    double sum = 0;
+    for (int i = 0; i < _serviceList.length; i++) {
+      double price =
+          double.tryParse(_serviceList[i].priceController!.text) ?? 0;
+      print(price);
+      int quantity =
+          int.tryParse(_serviceList[i].quantityController!.text) ?? 0;
+      sum += price * quantity;
+    }
+    setState(() {
+      _totalSum = sum;
+    });
+  }
+
+  Widget _sumWidget(double? finalSum) {
+    return Text('SUM = ' + _totalSum.toString() + ' pln');
   }
 }
