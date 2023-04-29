@@ -91,4 +91,14 @@ class FirebaseService {
       return false;
     }
   }
+
+  Stream<QuerySnapshot> getWorkForUser(String date) {
+    String _userId = _auth.currentUser!.uid;
+
+    return _db
+        .collection(WORK_COLLECTION)
+        .where('userId', isEqualTo: _userId)
+        .where('date', isEqualTo: date)
+        .snapshots();
+  }
 }

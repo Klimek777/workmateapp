@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+
+import '../services/firebase_service.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -13,22 +16,18 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   double? _deviceHeight, _deviceWidth;
   DateTime _selectedDate = DateTime.now();
+  FirebaseService? _firebaseService;
 
   @override
+  void initState() {
+    super.initState();
+    _firebaseService = GetIt.instance.get<FirebaseService>();
+    print(_selectedDate);
+  }
+
   Widget build(BuildContext context) {
     _deviceHeight = MediaQuery.of(context).size.height;
     _deviceWidth = MediaQuery.of(context).size.width;
-
-    List<Widget> work = [
-      _workWidget('Ania', 'Stęzycka 62/18', 230.50, '12:00', 'Gdańsk', 'todo',
-          DateTime(2023, 04, 2023)),
-      _workWidget('Dawid', 'Berki 3/24', 1000, '15:00', 'Białogard', 'done',
-          DateTime(2023, 04, 26)),
-      _workWidget('Dawid', 'Berki 3/24', 1000, '15:00', 'Białogard', 'done',
-          DateTime(2023, 04, 26)),
-      _workWidget('Dawid', 'Berki 3/24', 1000, '15:00', 'Białogard', 'done',
-          DateTime(2023, 04, 26)),
-    ];
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -60,14 +59,15 @@ class _MainPageState extends State<MainPage> {
                 _mapButton(),
               ],
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: work.length,
-                itemBuilder: (context, index) {
-                  return work[index];
-                },
-              ),
-            )
+            // Expanded(
+            //   child: ListView.builder(
+            //     itemCount: work.length,
+            //     itemBuilder: (context, index) {
+            //       return work[index];
+            //     },
+            //   ),
+            // )
+            _worksListView(DateFormat('yyyy-MM-dd').format(_selectedDate))
           ],
         ),
       ),
@@ -136,7 +136,7 @@ class _MainPageState extends State<MainPage> {
                 ? Text("Your work for today")
                 : Text("Work for:"),
             Text(
-              DateFormat('dd-MM-yyyy').format(selectedDate),
+              DateFormat('yyyy-MM-dd').format(selectedDate),
               style: TextStyle(fontSize: 22),
             ),
           ],
@@ -156,11 +156,11 @@ class _MainPageState extends State<MainPage> {
   Widget _workWidget(
     String name,
     String street,
-    double price,
+    String price,
     String hour,
     String city,
     String status,
-    DateTime date,
+    String date,
   ) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -250,6 +250,38 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _worksListView(String date) {
+    return Expanded(
+      child: StreamBuilder<QuerySnapshot>(
+        stream: _firebaseService!.getWorkForUser(date),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List _workposts = snapshot.data!.docs.map((e) => e.data()).toList();
+            return ListView.builder(
+                itemCount: _workposts.length,
+                itemBuilder: (context, index) {
+                  Map _work = _workposts[index];
+                  return _workWidget(
+                      _work["name"],
+                      _work["address"],
+                      _work["sum"],
+                      "12:00",
+                      _work["city"],
+                      _work["status"],
+                      _work["date"]);
+                });
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Colors.orange,
+              ),
+            );
+          }
+        },
       ),
     );
   }
