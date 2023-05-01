@@ -65,6 +65,7 @@ class FirebaseService {
     String phone,
     String address,
     String city,
+    String time,
     String date,
     String? product,
     String? notes,
@@ -73,23 +74,39 @@ class FirebaseService {
   ) async {
     try {
       String _userId = _auth.currentUser!.uid;
-      await _db.collection(WORK_COLLECTION).add({
+      DocumentReference documentReference =
+          await _db.collection(WORK_COLLECTION).add({
         "userId": _userId,
         "name": name,
         "phone": phone,
         "address": address,
         "city": city,
+        "time": time,
         "date": date,
         "product": product,
         "notes": notes,
         "sum": sum,
         "status": status,
       });
+      String documentId = documentReference
+          .id; // get the documentId of the newly created document
+      setDocumentId(documentId); // set the documentId to be used later
+      return true;
 
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  String? _documentId;
+
+  void setDocumentId(String documentId) {
+    _documentId = documentId;
+  }
+
+  String? getDocumentId() {
+    return _documentId;
   }
 
   Stream<QuerySnapshot> getWorkForUser(String date) {
@@ -100,5 +117,27 @@ class FirebaseService {
         .where('userId', isEqualTo: _userId)
         .where('date', isEqualTo: date)
         .snapshots();
+  }
+
+  Future<bool> deleteWork(String documentId) async {
+    try {
+      await _db.collection(WORK_COLLECTION).doc(documentId).delete();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updateStatus(String documentId, String newStatus) async {
+    try {
+      await _db
+          .collection(WORK_COLLECTION)
+          .doc(documentId)
+          .update({'status': newStatus});
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 }

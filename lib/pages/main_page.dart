@@ -161,6 +161,7 @@ class _MainPageState extends State<MainPage> {
     String city,
     String status,
     String date,
+    String documentId,
   ) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -171,24 +172,29 @@ class _MainPageState extends State<MainPage> {
             label: 'delete',
             backgroundColor: Colors.black,
             borderRadius: BorderRadius.circular(30),
-            onPressed: (context) {},
+            onPressed: (context) async {
+              try {
+                await _firebaseService!.deleteWork(documentId);
+                print('Deleted document with id:' + documentId);
+              } catch (e) {
+                print(e);
+              }
+            },
           ),
           SlidableAction(
             icon: status == 'todo' ? Icons.done : Icons.close,
             backgroundColor: Colors.orange,
             borderRadius: BorderRadius.circular(30),
             label: status == 'todo' ? 'done' : 'todo',
-            onPressed: (context) {
-              if (status == 'done') {
+            onPressed: (context) async {
+              String newStatus = status == 'todo' ? 'done' : 'todo';
+              bool success =
+                  await _firebaseService!.updateStatus(documentId, newStatus);
+              if (success) {
                 setState(() {
-                  status == 'todo';
-                });
-              } else {
-                setState(() {
-                  status == 'done';
+                  status = newStatus;
                 });
               }
-              print(status);
             },
           )
         ]),
@@ -265,14 +271,16 @@ class _MainPageState extends State<MainPage> {
                 itemCount: _workposts.length,
                 itemBuilder: (context, index) {
                   Map _work = _workposts[index];
+                  String documentId = snapshot.data!.docs[index].id;
                   return _workWidget(
                       _work["name"],
                       _work["address"],
                       _work["sum"],
-                      "12:00",
+                      _work["time"],
                       _work["city"],
                       _work["status"],
-                      _work["date"]);
+                      _work["date"],
+                      documentId);
                 });
           } else {
             return const Center(

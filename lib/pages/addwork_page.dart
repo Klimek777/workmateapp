@@ -44,6 +44,7 @@ class _AddWrokState extends State<AddWrok> {
   TextEditingController _serviceNameController = TextEditingController();
   TextEditingController _quantityController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
+  TextEditingController _timeController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
 
@@ -132,6 +133,10 @@ class _AddWrokState extends State<AddWrok> {
               height: 10,
             ),
             _cityTextField(),
+            SizedBox(
+              height: 10,
+            ),
+            _timeTextField(),
             SizedBox(
               height: 10,
             ),
@@ -286,6 +291,52 @@ class _AddWrokState extends State<AddWrok> {
           _city = _value;
         });
       },
+    );
+  }
+
+  Widget _timeTextField() {
+    return TextField(
+      onTap: () async {
+        TimeOfDay? picked = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+          builder: (BuildContext context, Widget? child) {
+            return MediaQuery(
+              data:
+                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+              child: child!,
+            );
+          },
+        );
+        if (picked != null) {
+          print(
+              picked); //get the picked date in the format => 2022-07-04 00:00:00.000
+
+          setState(() {
+            _timeController.text =
+                '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+          });
+        } else {
+          print("Date is not selected");
+        }
+      },
+      readOnly: true,
+      controller: _timeController,
+      decoration: const InputDecoration(
+        hintText: "Choose the time...",
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(width: 2, color: Colors.orange),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(width: 2, color: Colors.orange),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
+      ),
     );
   }
 
@@ -497,17 +548,25 @@ class _AddWrokState extends State<AddWrok> {
   void _postWork() async {
     _workFormKey.currentState!.save();
     try {
-      await _firebaseService!.postWork(
+      bool success = await _firebaseService!.postWork(
           _name!,
           _phone!,
           _address!,
           _city!,
+          _timeController.text,
           _dateController.text,
           _serviceList.toString(),
           _notes,
           _totalSum.toString(),
           'todo');
-      Navigator.pop(context);
+
+      if (success) {
+        String documentId = _firebaseService!.getDocumentId()!;
+        print('Document added with id: $documentId');
+        Navigator.pop(context);
+      } else {
+        print('Error adding document');
+      }
     } catch (e) {
       print(e);
     }
