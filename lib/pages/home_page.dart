@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:workmateapp/pages/charts_page.dart';
 import 'package:workmateapp/pages/main_page.dart';
+import 'package:workmateapp/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +14,7 @@ class _HomePageState extends State<HomePage> {
   double? _deviceHeight, _deviceWidth;
   int _currentPage = 0;
 
-  final List<Widget> _pages = [MainPage(), ChartsPage()];
+  final List<Widget> _pages = [MainPage(), ChartsPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {

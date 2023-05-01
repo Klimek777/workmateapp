@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:workmateapp/pages/addwork_page.dart';
 import 'package:workmateapp/pages/home_page.dart';
 import 'package:workmateapp/pages/login_page.dart';
+import 'package:workmateapp/pages/profile_page.dart';
 import 'package:workmateapp/pages/register_page.dart';
 import 'package:workmateapp/services/firebase_service.dart';
 
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
         'login': (context) => LoginPage(),
         'register': (context) => RegisterPage(),
         'home': (context) => HomePage(),
-        'add_work': (context) => AddWrok()
+        'add_work': (context) => AddWrok(),
+        'profile': (context) => ProfilePage()
       },
       initialRoute: 'login',
       theme: ThemeData(
