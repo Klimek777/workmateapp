@@ -6,6 +6,7 @@ import 'package:workmateapp/pages/home_page.dart';
 import 'package:workmateapp/pages/login_page.dart';
 import 'package:workmateapp/pages/profile_page.dart';
 import 'package:workmateapp/pages/register_page.dart';
+import 'package:workmateapp/pages/workdetails_page.dart';
 import 'package:workmateapp/services/firebase_service.dart';
 
 void main() async {
@@ -31,7 +32,20 @@ class MyApp extends StatelessWidget {
         'register': (context) => RegisterPage(),
         'home': (context) => HomePage(),
         'add_work': (context) => AddWrok(),
-        'profile': (context) => ProfilePage()
+        'profile': (context) => ProfilePage(),
+        'details': (context) => WorkDetailsPage(
+              name: '',
+              address: '',
+              sum: '',
+              time: '',
+              city: '',
+              status: '',
+              date: '',
+              documentId: '',
+              phone: '',
+              notes: '',
+              product: '',
+            )
       },
       initialRoute: 'login',
       theme: ThemeData(

@@ -272,15 +272,32 @@ class _MainPageState extends State<MainPage> {
                 itemBuilder: (context, index) {
                   Map _work = _workposts[index];
                   String documentId = snapshot.data!.docs[index].id;
-                  return _workWidget(
-                      _work["name"],
-                      _work["address"],
-                      _work["sum"],
-                      _work["time"],
-                      _work["city"],
-                      _work["status"],
-                      _work["date"],
-                      documentId);
+                  return InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, 'details', arguments: {
+                        'name': _work["name"],
+                        'address': _work["address"],
+                        'sum': _work["sum"],
+                        'time': _work["time"],
+                        'city': _work["city"],
+                        'status': _work["status"],
+                        'date': _work["date"],
+                        'documentId': documentId,
+                        'phone': _work["phone"],
+                        'notes': _work["notes"],
+                        'product': _work["product"]
+                      });
+                    },
+                    child: _workWidget(
+                        _work["name"],
+                        _work["address"],
+                        _work["sum"],
+                        _work["time"],
+                        _work["city"],
+                        _work["status"],
+                        _work["date"],
+                        documentId),
+                  );
                 });
           } else {
             return const Center(
