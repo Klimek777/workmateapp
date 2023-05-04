@@ -202,7 +202,8 @@ class _MainPageState extends State<MainPage> {
           width: _deviceWidth! * 0.9,
           height: _deviceHeight! * 0.11,
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            border: Border.all(width: 1, color: Colors.black),
+            color: Colors.grey[100],
             borderRadius: BorderRadius.circular(30),
           ),
           child: Padding(
@@ -267,6 +268,7 @@ class _MainPageState extends State<MainPage> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List _workposts = snapshot.data!.docs.map((e) => e.data()).toList();
+            _workposts.sort((a, b) => a["time"].compareTo(b["time"]));
             return ListView.builder(
                 itemCount: _workposts.length,
                 itemBuilder: (context, index) {

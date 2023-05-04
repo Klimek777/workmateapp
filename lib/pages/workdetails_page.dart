@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class WorkDetailsPage extends StatefulWidget {
   const WorkDetailsPage({
@@ -92,7 +94,7 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
       String product) {
     if (product.contains(',')) {
       product = product.replaceAll(',', '\n');
-      product = product.replaceAll('[', '');
+      product = product.replaceAll('[', ' ');
       product = product.replaceAll(']', '');
     } else {
       product = product.replaceAll('[', '');
@@ -113,40 +115,123 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        'Personal Info: ',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
-                      ),
-                      Text(name),
-                      Text(address),
-                      Text(city),
-                      Text(phone)
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        'Service info:',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
-                      ),
-                      Text(time),
-                      Text(status),
-                      Text(product),
-                      Text(sum + ' pln ')
-                    ],
-                  ),
-                ]),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      'Personal Info: ',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      name,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(address,
+                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                    Text(city,
+                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                    Text(phone,
+                        style: TextStyle(color: Colors.white, fontSize: 15))
+                  ],
+                ),
+                Column(
+                  children: [
+                    Text(
+                      'Service info:',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(time,
+                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                    Text(status,
+                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                    Text(product,
+                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                    Text(sum + ' pln ',
+                        style: TextStyle(color: Colors.white, fontSize: 15))
+                  ],
+                ),
+              ],
+            ),
           ),
+          SizedBox(
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(100)),
+                height: 50,
+                width: 50,
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.white,
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(100)),
+                height: 50,
+                width: 50,
+                child: Icon(
+                  Icons.done,
+                  color: Colors.white,
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(100)),
+                height: 50,
+                width: 50,
+                child: Icon(
+                  Icons.pin_drop,
+                  color: Colors.white,
+                ),
+              ),
+              InkWell(
+                onTap: () async {
+                  await launchUrl(Uri.parse("tel:$phone"));
+                  print('phone');
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(100)),
+                  height: 50,
+                  width: 50,
+                  child: Icon(
+                    Icons.phone,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            notes,
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          )
         ],
       ),
     );
