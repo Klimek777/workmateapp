@@ -74,7 +74,11 @@ class _AddWrokState extends State<AddWrok> {
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.max,
-              children: [_headWidget(), _formWidget(), _saveButton()],
+              children: [
+                _headWidget(),
+                _formWidget(),
+                _saveButton(),
+              ],
             ),
           ),
         ),
@@ -222,19 +226,19 @@ class _AddWrokState extends State<AddWrok> {
       ),
       onChanged: (value) {
         final number = int.tryParse(value.replaceAll(' ', ''));
-        if (number != null) {
-          final formatter = NumberFormat('# ###');
-          final newText = formatter.format(number);
-          final regex = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
-          final formattedText =
-              newText.replaceAllMapped(regex, (Match m) => '${m[1]} ');
-          if (formattedText != value) {
-            _phoneController.value = TextEditingValue(
-              text: formattedText,
-              selection: TextSelection.collapsed(offset: formattedText.length),
-            );
-          }
+        if (value.length > 9) {
+          value = value.substring(0, 9); // limit to 9 digits
         }
+        if (value.length > 3) {
+          value = value.replaceRange(3, value.length, ' ' + value.substring(3));
+        }
+        if (value.length > 7) {
+          value = value.replaceRange(7, value.length, ' ' + value.substring(7));
+        }
+        _phoneController.value = TextEditingValue(
+          text: value,
+          selection: TextSelection.collapsed(offset: value.length),
+        );
       },
       onSaved: (_value) {
         setState(() {
