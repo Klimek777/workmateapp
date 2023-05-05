@@ -181,6 +181,9 @@ class _MainPageState extends State<MainPage> {
               }
             },
           ),
+          SizedBox(
+            width: 8,
+          ),
           SlidableAction(
             icon: status == 'todo' ? Icons.done : Icons.close,
             backgroundColor: Colors.orange,
@@ -198,62 +201,65 @@ class _MainPageState extends State<MainPage> {
             },
           )
         ]),
-        child: Container(
-          width: _deviceWidth! * 0.9,
-          height: _deviceHeight! * 0.11,
-          decoration: BoxDecoration(
-            border: Border.all(width: 1, color: Colors.black),
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Text(
-                          name,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(street),
-                        Text(city)
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text(price.toString() + ' zł'),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(hour)
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                              color: status == 'todo'
-                                  ? Color.fromARGB(255, 255, 137, 128)
-                                  : Color.fromARGB(255, 123, 225, 124),
-                              borderRadius: BorderRadius.circular(20)),
-                        )
-                      ],
-                    )
-                  ],
-                )
-              ],
+        child: Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Container(
+            width: _deviceWidth! * 0.9,
+            height: _deviceHeight! * 0.11,
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.black),
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text(
+                            name,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(street),
+                          Text(city)
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(price.toString() + ' zł'),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(hour)
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                                color: status == 'todo'
+                                    ? Color.fromARGB(255, 255, 137, 128)
+                                    : Color.fromARGB(255, 123, 225, 124),
+                                borderRadius: BorderRadius.circular(20)),
+                          )
+                        ],
+                      )
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -287,7 +293,8 @@ class _MainPageState extends State<MainPage> {
                         'documentId': documentId,
                         'phone': _work["phone"],
                         'notes': _work["notes"],
-                        'product': _work["product"]
+                        'product': _work["product"],
+                        'documentId': documentId
                       });
                     },
                     child: _workWidget(

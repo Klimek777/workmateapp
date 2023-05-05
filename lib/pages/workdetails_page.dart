@@ -66,7 +66,7 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
         children: [
           Text(
             'Details about ' + name,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           IconButton(
               onPressed: () {
@@ -173,15 +173,27 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(100)),
-                height: 50,
-                width: 50,
-                child: Icon(
-                  Icons.edit,
-                  color: Colors.white,
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, 'edit', arguments: {
+                    'name': name,
+                    'phone': phone,
+                    'address': address,
+                    'city': city,
+                    'time': time,
+                    'date': date
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(100)),
+                  height: 50,
+                  width: 50,
+                  child: Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Container(
