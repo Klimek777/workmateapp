@@ -294,7 +294,7 @@ class _MainPageState extends State<MainPage> {
                         'phone': _work["phone"],
                         'notes': _work["notes"],
                         'product': _work["product"],
-                        'documentId': documentId
+                        'documentID': documentId
                       });
                     },
                     child: _workWidget(

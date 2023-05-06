@@ -30,7 +30,11 @@ class Service {
 
   @override
   String toString() {
-    return serviceNameController!.text + ' x ' + quantityController!.text;
+    return serviceNameController!.text +
+        'x' +
+        quantityController!.text +
+        'x' +
+        priceController!.text;
   }
 }
 
@@ -156,6 +160,10 @@ class _AddWrokState extends State<AddWrok> {
             SizedBox(
               height: 10,
             ),
+            _sumWidget(_totalSum),
+            SizedBox(
+              height: 10,
+            ),
             Text(
               'Notes',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -167,10 +175,6 @@ class _AddWrokState extends State<AddWrok> {
             SizedBox(
               height: 10,
             ),
-            _sumWidget(_totalSum),
-            SizedBox(
-              height: 10,
-            )
           ],
         ),
       ),

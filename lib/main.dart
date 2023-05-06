@@ -54,6 +54,9 @@ class MyApp extends StatelessWidget {
               city: '',
               time: '',
               date: '',
+              product: '',
+              notes: '',
+              status: '',
             )
       },
       initialRoute: 'login',

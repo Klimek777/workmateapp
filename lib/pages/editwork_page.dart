@@ -6,24 +6,50 @@ import 'package:intl/intl.dart';
 import '../services/firebase_service.dart';
 
 class EditDeatilsPage extends StatefulWidget {
-  const EditDeatilsPage(
-      {super.key,
-      required String name,
-      required String phone,
-      required String address,
-      required String city,
-      required String time,
-      required String date});
+  const EditDeatilsPage({
+    super.key,
+    required String name,
+    required String phone,
+    required String address,
+    required String city,
+    required String time,
+    required String date,
+    required String product,
+    required String notes,
+    required String status,
+  });
 
   @override
   State<EditDeatilsPage> createState() => _EditDeatilsPageState();
 }
 
+class Service {
+  TextEditingController? serviceNameController;
+  TextEditingController? quantityController;
+  TextEditingController? priceController;
+
+  Service({
+    this.serviceNameController,
+    this.quantityController,
+    this.priceController,
+  });
+
+  @override
+  String toString() {
+    return serviceNameController!.text +
+        'x' +
+        quantityController!.text +
+        'x' +
+        priceController!.text;
+  }
+}
+
 class _EditDeatilsPageState extends State<EditDeatilsPage> {
   FirebaseService? _firebaseService;
+  final GlobalKey<FormState> _workFormKey = GlobalKey<FormState>();
   double? _deviceHeight, _deviceWidth, _price, _totalSum;
   // ignore: unused_field
-  String? _name, _phone, _city, _address, _notes, _serviceName;
+  String? _name, _phone, _city, _address, _notes, _serviceName, documentId;
   int? _q;
   TextEditingController _nameController = TextEditingController();
   TextEditingController _serviceNameController = TextEditingController();
@@ -34,15 +60,18 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
   TextEditingController _phoneController = TextEditingController();
   TextEditingController _cityController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
+  TextEditingController _notesController = TextEditingController();
+  TextEditingController _statusController = TextEditingController();
+
   void initState() {
     super.initState();
     _firebaseService = GetIt.instance.get<FirebaseService>();
+    print(_serviceList);
   }
 
   @override
-  Widget build(BuildContext context) {
-    _deviceHeight = MediaQuery.of(context).size.height;
-    _deviceWidth = MediaQuery.of(context).size.width;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     final Map<String, dynamic> arguments =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     _nameController.text = arguments['name'];
@@ -51,6 +80,43 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
     _cityController.text = arguments['city'];
     _timeController.text = arguments['time'];
     _dateController.text = arguments['date'];
+    _notesController.text = arguments['notes'];
+    documentId = arguments['documentId'];
+    _statusController.text = arguments['status'];
+
+    var product = arguments['product'];
+
+    if (product is String) {
+      // Split the string by newline characters and remove any leading/trailing whitespace
+      var productLines = product.split('\n').map((line) => line.trim());
+      _productList = productLines.toList();
+      for (int i = 0; i < _productList.length; i++) {
+        var _serviceNameController =
+            TextEditingController(text: _productList[i].split('x')[0]);
+        var _quantityController =
+            TextEditingController(text: _productList[i].split('x')[1]);
+        var _priceController =
+            TextEditingController(text: _productList[i].split('x')[2]);
+
+        _serviceList.add(Service(
+            serviceNameController: _serviceNameController,
+            quantityController: _quantityController,
+            priceController: _priceController));
+      }
+    }
+
+    _calculateFinalSum();
+    print(arguments['documentId']);
+  }
+
+  List _productList = [];
+  List<Service> _serviceList = [];
+
+  @override
+  Widget build(BuildContext context) {
+    _deviceHeight = MediaQuery.of(context).size.height;
+    _deviceWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: SafeArea(
           child: SizedBox(
@@ -59,7 +125,10 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
         child: SingleChildScrollView(
             child: Column(
           mainAxisSize: MainAxisSize.max,
-          children: [_headWidget(), _formWidget()],
+          children: [
+            _headWidget(),
+            _formWidget(),
+          ],
         )),
       )),
     );
@@ -92,6 +161,7 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
     return Padding(
       padding: const EdgeInsets.only(right: 30, left: 30),
       child: Form(
+        key: _workFormKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -130,6 +200,32 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
               'Product',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
+            SizedBox(
+              height: 10,
+            ),
+            _serviceListWidget(),
+            SizedBox(
+              height: 10,
+            ),
+            _sumWidget(_totalSum),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Notes',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            _notesWidget(),
+            SizedBox(
+              height: 10,
+            ),
+            _saveButton(),
+            SizedBox(
+              height: 10,
+            ),
           ],
         ),
       ),
@@ -156,7 +252,7 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
       ),
       onSaved: (_value) {
         setState(() {
-          _name = _value;
+          _nameController.text = _value!;
         });
       },
     );
@@ -202,7 +298,7 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
       },
       onSaved: (_value) {
         setState(() {
-          _phone = _value;
+          _phoneController.text = _value!;
         });
       },
     );
@@ -228,7 +324,7 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
       ),
       onSaved: (_value) {
         setState(() {
-          _address = _value;
+          _addressController.text = _value!;
         });
       },
     );
@@ -254,7 +350,7 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
       ),
       onSaved: (_value) {
         setState(() {
-          _city = _value;
+          _cityController.text = _value!;
         });
       },
     );
@@ -350,5 +446,189 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
         ),
       ),
     );
+  }
+
+  Widget _serviceWidget({int? index, required Service service}) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: TextField(
+            controller: service.serviceNameController,
+            decoration: InputDecoration(
+              hintText: 'Product name',
+            ),
+          ),
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: TextField(
+            onChanged: ((value) => _calculateFinalSum()),
+            controller: service.quantityController,
+            decoration: InputDecoration(
+              hintText: 'Qty',
+            ),
+          ),
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: TextField(
+            onChanged: (value) => _calculateFinalSum(),
+            controller: service.priceController,
+            decoration: InputDecoration(
+              hintText: 'Price',
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 2,
+        ),
+        IconButton(
+            onPressed: () {
+              setState(() {
+                if (index != null) {
+                  _serviceList.removeAt(index);
+                  print(_serviceList);
+                }
+              });
+            },
+            icon: Icon(Icons.close))
+      ],
+    );
+  }
+
+  Widget _serviceListWidget() {
+    return Column(
+      children: [
+        for (int i = 0; i < _serviceList.length; i++) ...[
+          _serviceWidget(index: i, service: _serviceList[i]),
+          SizedBox(height: 10),
+        ], // wyświetl istniejące widgety
+        SizedBox(height: 10),
+        MaterialButton(
+          child: Container(
+            width: 120,
+            height: 30,
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: Center(
+              child: Text(
+                'Add Product',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+          onPressed: () {
+            setState(() {
+              _serviceList.add(Service(
+                  serviceNameController: TextEditingController(),
+                  quantityController: TextEditingController(),
+                  priceController: TextEditingController()));
+              print(_serviceList);
+              _calculateFinalSum();
+              // dodaj nowy widget do listy
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _notesWidget() {
+    return TextFormField(
+        controller: _notesController,
+        decoration: InputDecoration(
+          isDense: true,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.orange, width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.orange, width: 2.0),
+          ),
+          border: OutlineInputBorder(),
+          labelStyle: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              letterSpacing: 2.0),
+          hintText: 'Make some notes about your customer',
+        ),
+        keyboardType: TextInputType.multiline,
+        minLines: 2,
+        maxLines: 11,
+        onSaved: (_value) {
+          setState(() {
+            _notesController.text = _value!;
+          });
+        });
+  }
+
+  void _calculateFinalSum() {
+    double sum = 0;
+    for (int i = 0; i < _serviceList.length; i++) {
+      double price =
+          double.tryParse(_serviceList[i].priceController!.text) ?? 0;
+      print(price);
+      int quantity =
+          int.tryParse(_serviceList[i].quantityController!.text) ?? 0;
+      sum += price * quantity;
+    }
+    setState(() {
+      _totalSum = sum;
+    });
+  }
+
+  Widget _sumWidget(double? finalSum) {
+    return Text('SUM = ' + _totalSum.toString() + ' pln');
+  }
+
+  Widget _saveButton() {
+    return MaterialButton(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.orange,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Center(
+              child: Text(
+            'Update',
+            style: TextStyle(color: Colors.white),
+          )),
+          width: 60,
+          height: 30,
+        ),
+        onPressed: () async {
+          _updateWork();
+        });
+  }
+
+  void _updateWork() async {
+    _workFormKey.currentState!.save();
+    try {
+      bool success = await _firebaseService!.updateWork(
+          documentId.toString(),
+          _nameController.text,
+          _phoneController.text,
+          _addressController.text,
+          _cityController.text,
+          _timeController.text,
+          _dateController.text,
+          _serviceList.toString(),
+          _notesController.text,
+          _totalSum.toString(),
+          _statusController.text);
+
+      if (success) {
+        print('Document updated with id: $documentId');
+        Navigator.pop(context);
+      } else {
+        print('Error adding document');
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }

@@ -145,4 +145,38 @@ class FirebaseService {
   Future<void> logout() async {
     await _auth.signOut();
   }
+
+  Future<bool> updateWork(
+    String documentId,
+    String name,
+    String phone,
+    String address,
+    String city,
+    String time,
+    String date,
+    String? product,
+    String? notes,
+    String sum,
+    String status,
+  ) async {
+    try {
+      String _userId = _auth.currentUser!.uid;
+      await _db.collection(WORK_COLLECTION).doc(documentId).update({
+        "userId": _userId,
+        "name": name,
+        "phone": phone,
+        "address": address,
+        "city": city,
+        "time": time,
+        "date": date,
+        "product": product,
+        "notes": notes,
+        "sum": sum,
+        "status": status,
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

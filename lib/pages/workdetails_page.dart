@@ -51,7 +51,8 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
               arguments['date'],
               arguments['phone'],
               arguments['notes'],
-              arguments['product'])
+              arguments['product'],
+              arguments['documentID'])
           // _customerCardWidget()
         ],
       ),
@@ -82,16 +83,18 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
   }
 
   Widget _customerCardWidget(
-      String name,
-      String address,
-      String sum,
-      String time,
-      String city,
-      String status,
-      String date,
-      String phone,
-      String notes,
-      String product) {
+    String name,
+    String address,
+    String sum,
+    String time,
+    String city,
+    String status,
+    String date,
+    String phone,
+    String notes,
+    String product,
+    String documentId,
+  ) {
     if (product.contains(',')) {
       product = product.replaceAll(',', '\n');
       product = product.replaceAll('[', ' ');
@@ -181,7 +184,11 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
                     'address': address,
                     'city': city,
                     'time': time,
-                    'date': date
+                    'date': date,
+                    'product': product,
+                    'notes': notes,
+                    'status': status,
+                    'documentId': documentId,
                   });
                 },
                 child: Container(
@@ -247,5 +254,9 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
         ],
       ),
     );
+  }
+
+  void _refreshData() {
+    setState(() {});
   }
 }
