@@ -185,12 +185,12 @@ class _MainPageState extends State<MainPage> {
             width: 8,
           ),
           SlidableAction(
-            icon: status == 'todo' ? Icons.done : Icons.close,
+            icon: status == 'to do' ? Icons.done : Icons.close,
             backgroundColor: Colors.orange,
             borderRadius: BorderRadius.circular(30),
-            label: status == 'todo' ? 'done' : 'todo',
+            label: status == 'to do' ? 'done' : 'to do',
             onPressed: (context) async {
-              String newStatus = status == 'todo' ? 'done' : 'todo';
+              String newStatus = status == 'to do' ? 'done' : 'to do';
               bool success =
                   await _firebaseService!.updateStatus(documentId, newStatus);
               if (success) {
@@ -249,7 +249,7 @@ class _MainPageState extends State<MainPage> {
                             width: 30,
                             height: 30,
                             decoration: BoxDecoration(
-                                color: status == 'todo'
+                                color: status == 'to do'
                                     ? Color.fromARGB(255, 255, 137, 128)
                                     : Color.fromARGB(255, 123, 225, 124),
                                 borderRadius: BorderRadius.circular(20)),

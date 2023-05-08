@@ -566,7 +566,7 @@ class _AddWrokState extends State<AddWrok> {
           _serviceList.toString(),
           _notes,
           _totalSum.toString(),
-          'todo');
+          'to do');
 
       if (success) {
         String documentId = _firebaseService!.getDocumentId()!;

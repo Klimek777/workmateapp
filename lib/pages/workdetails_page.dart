@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+import '../services/firebase_service.dart';
 
 class WorkDetailsPage extends StatefulWidget {
   const WorkDetailsPage({
@@ -24,8 +27,14 @@ class WorkDetailsPage extends StatefulWidget {
 
 class _WorkDetailsPageState extends State<WorkDetailsPage> {
   double? _deviceHeight, _deviceWidth;
+  FirebaseService? _firebaseService;
 
   @override
+  void initState() {
+    super.initState();
+    _firebaseService = GetIt.instance.get<FirebaseService>();
+  }
+
   Widget build(BuildContext context) {
     _deviceHeight = MediaQuery.of(context).size.height;
     _deviceWidth = MediaQuery.of(context).size.width;
@@ -209,9 +218,23 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
                     borderRadius: BorderRadius.circular(100)),
                 height: 50,
                 width: 50,
-                child: Icon(
-                  Icons.done,
-                  color: Colors.white,
+                child: InkWell(
+                  onTap: () async {
+                    String newStatus = status == 'to do' ? 'done' : 'todo';
+                    bool success = await _firebaseService!
+                        .updateStatus(documentId, newStatus);
+                    if (success) {
+                      setState(() {
+                        status = newStatus;
+                        print('staus updated for' + status);
+                      });
+                    }
+                  },
+                  child: Icon(
+                    status == 'to do' ? Icons.done : Icons.close,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                 ),
               ),
               Container(

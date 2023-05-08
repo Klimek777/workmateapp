@@ -145,13 +145,14 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(
-                Icons.close,
-                size: 30,
-              )),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.close,
+              size: 30,
+            ),
+          ),
         ],
       ),
     );
@@ -623,7 +624,12 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
 
       if (success) {
         print('Document updated with id: $documentId');
-        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              backgroundColor: Colors.orange,
+              content: Text('Data successfully updated')),
+        );
+        Navigator.pop(context, true);
       } else {
         print('Error adding document');
       }
