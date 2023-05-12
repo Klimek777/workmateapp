@@ -1,6 +1,6 @@
 # workmateapp
 
-The Workmate app will help you plan visits to customers, record services and their costs, manage clients, plan services in advance, and check results such as earnings or completed orders in your company achieved in a given month.
+The Workmate app will help you plan visits to customers, record services and their costs, manage clients, plan services in advance, and check results such as earnings or completed orders in your company achieved in a given month. App was created using Flutter and Firebase!
 ## Presentation
 
 ![workamate_img](https://github.com/Klimek777/workmateapp/assets/90191027/1d87dd51-2aaa-466a-9505-c2d8ff962e6f)
