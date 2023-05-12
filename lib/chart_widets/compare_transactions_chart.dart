@@ -2,7 +2,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class _BarChart extends StatelessWidget {
-  const _BarChart();
+  final int planned;
+  final int done;
+  const _BarChart({required this.planned, required this.done});
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +105,7 @@ class _BarChart extends StatelessWidget {
           x: 0,
           barRods: [
             BarChartRodData(
-              toY: 10,
+              toY: planned.toDouble(),
               gradient: _barsGradient,
             )
           ],
@@ -113,7 +115,7 @@ class _BarChart extends StatelessWidget {
           x: 1,
           barRods: [
             BarChartRodData(
-              toY: 5,
+              toY: done.toDouble(),
               gradient: _barsGradient,
             )
           ],
@@ -123,7 +125,9 @@ class _BarChart extends StatelessWidget {
 }
 
 class BarChartSample3 extends StatefulWidget {
-  const BarChartSample3({super.key});
+  final int planned;
+  final int done;
+  const BarChartSample3({super.key, required this.planned, required this.done});
 
   @override
   State<StatefulWidget> createState() => BarChartSample3State();
@@ -132,9 +136,12 @@ class BarChartSample3 extends StatefulWidget {
 class BarChartSample3State extends State<BarChartSample3> {
   @override
   Widget build(BuildContext context) {
-    return const AspectRatio(
+    return AspectRatio(
       aspectRatio: 2.0,
-      child: _BarChart(),
+      child: _BarChart(
+        planned: widget.planned,
+        done: widget.done,
+      ),
     );
   }
 }

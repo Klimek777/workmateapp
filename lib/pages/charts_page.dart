@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get_it/get_it.dart';
 
 import '../services/firebase_service.dart';
@@ -17,7 +20,7 @@ class _ChartsPageState extends State<ChartsPage> {
   double? _deviceHeight, _deviceWidth;
   FirebaseService? _firebaseService;
   DateTime now = DateTime.now();
-  List months = [
+  List<String> months = [
     'January',
     'February',
     'March',
@@ -34,6 +37,8 @@ class _ChartsPageState extends State<ChartsPage> {
 
   String _selectedMonth = 'January';
   int? _currentMonth;
+  int? _selectedMonthIndex, planned, done;
+  double? youEarned, youCouldEarn;
   @override
   void initState() {
     super.initState();
@@ -41,6 +46,8 @@ class _ChartsPageState extends State<ChartsPage> {
     _currentMonth = now.month;
     print(_currentMonth);
     _selectedMonth = months[_currentMonth! - 1];
+    _selectedMonthIndex = _currentMonth;
+    test(_selectedMonthIndex!);
   }
 
   Widget build(BuildContext context) {
@@ -59,11 +66,16 @@ class _ChartsPageState extends State<ChartsPage> {
               SizedBox(
                 height: 60,
               ),
-              BarChartSample3(),
+              _chart(),
               SizedBox(
                 height: 40,
               ),
-              _yourEarningsWidget()
+              _yourEarningsWidget(),
+              TextButton(
+                  onPressed: () {
+                    test(_selectedMonthIndex!);
+                  },
+                  child: Text('klcik'))
             ],
           ),
         ),
@@ -99,22 +111,14 @@ class _ChartsPageState extends State<ChartsPage> {
         onChanged: (String? newValue) {
           setState(() {
             _selectedMonth = newValue!;
+            _selectedMonthIndex =
+                months.indexOf(newValue); // Get the index of the selected month
+
+            print(_selectedMonth);
+            test(_selectedMonthIndex! + 1);
           });
         },
-        items: <String>[
-          'January',
-          'February',
-          'March',
-          'April',
-          'May',
-          'June',
-          'July',
-          'August',
-          'September',
-          'October',
-          'November',
-          'December'
-        ].map<DropdownMenuItem<String>>((String value) {
+        items: months.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),
@@ -134,7 +138,7 @@ class _ChartsPageState extends State<ChartsPage> {
                 style: TextStyle(color: Colors.black, fontSize: 20),
                 children: [
                   TextSpan(
-                      text: ' 1600 pln!',
+                      text: ' $youEarned pln!',
                       style: TextStyle(
                           color: Colors.orange, fontWeight: FontWeight.bold))
                 ]),
@@ -148,12 +152,50 @@ class _ChartsPageState extends State<ChartsPage> {
                 style: TextStyle(color: Colors.black),
                 children: [
                   TextSpan(
-                      text: ' 2300 pln!',
+                      text: ' $youCouldEarn pln!',
                       style: TextStyle(color: Colors.orange))
                 ]),
           ),
         ],
       ),
     );
+  }
+
+  void test(int month) async {
+    Map<String, dynamic> allresults =
+        await _firebaseService!.getAllWorkForUser(month);
+    QuerySnapshot snapshot = allresults['snapshot'];
+    int count = allresults['count'];
+    print(count);
+
+    Map<String, dynamic> doneresults =
+        await _firebaseService!.getDoneWorkForUser(month);
+    QuerySnapshot doneSnapshot = doneresults['snapshot'];
+    int countDone = doneresults['count'];
+    print(countDone);
+
+    double sumOfDoneWork =
+        await _firebaseService!.getSumOfDoneWorkForUser(month);
+    print(sumOfDoneWork);
+
+    double sumOfAllWork = await _firebaseService!.getSumOfAllWorkForUser(month);
+    print(sumOfAllWork);
+    setState(() {
+      planned = count;
+      done = countDone;
+      youCouldEarn = sumOfAllWork;
+      youEarned = sumOfDoneWork;
+    });
+  }
+
+  Widget _chart() {
+    if (planned != null && done != null) {
+      return BarChartSample3(
+        planned: planned!,
+        done: done!,
+      );
+    } else {
+      return CircularProgressIndicator();
+    }
   }
 }

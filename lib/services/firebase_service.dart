@@ -120,6 +120,101 @@ class FirebaseService {
         .snapshots();
   }
 
+  Future<Map<String, dynamic>> getAllWorkForUser(int month) async {
+    String _userId = _auth.currentUser!.uid;
+    // Construct the start and end dates of the desired month
+    DateTime startDate = DateTime(DateTime.now().year, month, 1);
+    DateTime endDate =
+        DateTime(DateTime.now().year, month + 1, 1).subtract(Duration(days: 1));
+
+    // Format the dates as strings in the YYYY-MM-DD format
+    String startDateString = startDate.toString().substring(0, 10);
+    String endDateString = endDate.toString().substring(0, 10);
+
+    QuerySnapshot snapshot = await _db
+        .collection(WORK_COLLECTION)
+        .where('userId', isEqualTo: _userId)
+        .where('date', isGreaterThanOrEqualTo: startDateString)
+        .where('date', isLessThanOrEqualTo: endDateString)
+        .get();
+
+    int count = snapshot.docs.length;
+
+    return {'snapshot': snapshot, 'count': count};
+  }
+
+  Future<Map<String, dynamic>> getDoneWorkForUser(int month) async {
+    String _userId = _auth.currentUser!.uid;
+    // Construct the start and end dates of the desired month
+    DateTime startDate = DateTime(DateTime.now().year, month, 1);
+    DateTime endDate =
+        DateTime(DateTime.now().year, month + 1, 1).subtract(Duration(days: 1));
+
+    // Format the dates as strings in the YYYY-MM-DD format
+    String startDateString = startDate.toString().substring(0, 10);
+    String endDateString = endDate.toString().substring(0, 10);
+    QuerySnapshot snapshot = await _db
+        .collection(WORK_COLLECTION)
+        .where('userId', isEqualTo: _userId)
+        .where('status', isEqualTo: 'done')
+        .where('date', isGreaterThanOrEqualTo: startDateString)
+        .where('date', isLessThanOrEqualTo: endDateString)
+        .get();
+
+    int count = snapshot.docs.length;
+
+    return {'snapshot': snapshot, 'count': count};
+  }
+
+  Future<double> getSumOfDoneWorkForUser(int month) async {
+    String _userId = _auth.currentUser!.uid;
+    // Construct the start and end dates of the desired month
+    DateTime startDate = DateTime(DateTime.now().year, month, 1);
+    DateTime endDate =
+        DateTime(DateTime.now().year, month + 1, 1).subtract(Duration(days: 1));
+
+    // Format the dates as strings in the YYYY-MM-DD format
+    String startDateString = startDate.toString().substring(0, 10);
+    String endDateString = endDate.toString().substring(0, 10);
+
+    QuerySnapshot querySnapshot = await _db
+        .collection(WORK_COLLECTION)
+        .where('userId', isEqualTo: _userId)
+        .where('date', isGreaterThanOrEqualTo: startDateString)
+        .where('date', isLessThanOrEqualTo: endDateString)
+        .where('status', isEqualTo: 'done')
+        .get();
+
+    double sum = querySnapshot.docs.fold(
+        0, (previousValue, doc) => previousValue + double.parse(doc['sum']));
+
+    return sum;
+  }
+
+  Future<double> getSumOfAllWorkForUser(int month) async {
+    String _userId = _auth.currentUser!.uid;
+    // Construct the start and end dates of the desired month
+    DateTime startDate = DateTime(DateTime.now().year, month, 1);
+    DateTime endDate =
+        DateTime(DateTime.now().year, month + 1, 1).subtract(Duration(days: 1));
+
+    // Format the dates as strings in the YYYY-MM-DD format
+    String startDateString = startDate.toString().substring(0, 10);
+    String endDateString = endDate.toString().substring(0, 10);
+
+    QuerySnapshot querySnapshot = await _db
+        .collection(WORK_COLLECTION)
+        .where('userId', isEqualTo: _userId)
+        .where('date', isGreaterThanOrEqualTo: startDateString)
+        .where('date', isLessThanOrEqualTo: endDateString)
+        .get();
+
+    double sum = querySnapshot.docs.fold(
+        0, (previousValue, doc) => previousValue + double.parse(doc['sum']));
+
+    return sum;
+  }
+
   Future<bool> deleteWork(String documentId) async {
     try {
       await _db.collection(WORK_COLLECTION).doc(documentId).delete();

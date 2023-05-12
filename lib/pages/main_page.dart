@@ -207,7 +207,6 @@ class _MainPageState extends State<MainPage> {
             width: _deviceWidth! * 0.9,
             height: _deviceHeight! * 0.11,
             decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.black),
               color: Colors.grey[100],
               borderRadius: BorderRadius.circular(30),
             ),
