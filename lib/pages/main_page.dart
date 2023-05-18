@@ -196,6 +196,7 @@ class _MainPageState extends State<MainPage> {
               if (success) {
                 setState(() {
                   status = newStatus;
+                  print('updated to new status with id' + documentId);
                 });
               }
             },
@@ -270,15 +271,15 @@ class _MainPageState extends State<MainPage> {
     return Expanded(
       child: StreamBuilder<QuerySnapshot>(
         stream: _firebaseService!.getWorkForUser(date),
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             List _workposts = snapshot.data!.docs.map((e) => e.data()).toList();
-            _workposts.sort((a, b) => a["time"].compareTo(b["time"]));
             return ListView.builder(
                 itemCount: _workposts.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   Map _work = _workposts[index];
                   String documentId = snapshot.data!.docs[index].id;
+
                   return InkWell(
                     onTap: () {
                       Navigator.pushNamed(context, 'details', arguments: {
@@ -289,12 +290,12 @@ class _MainPageState extends State<MainPage> {
                         'city': _work["city"],
                         'status': _work["status"],
                         'date': _work["date"],
-                        'documentId': documentId,
                         'phone': _work["phone"],
                         'notes': _work["notes"],
                         'product': _work["product"],
                         'documentID': documentId
                       });
+                      print(_workposts[index]);
                     },
                     child: _workWidget(
                         _work["name"],

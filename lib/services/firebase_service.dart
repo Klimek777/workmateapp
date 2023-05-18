@@ -115,6 +115,7 @@ class FirebaseService {
 
     return _db
         .collection(WORK_COLLECTION)
+        .orderBy('time')
         .where('userId', isEqualTo: _userId)
         .where('date', isEqualTo: date)
         .snapshots();

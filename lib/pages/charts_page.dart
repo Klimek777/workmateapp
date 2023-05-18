@@ -71,11 +71,6 @@ class _ChartsPageState extends State<ChartsPage> {
                 height: 40,
               ),
               _yourEarningsWidget(),
-              TextButton(
-                  onPressed: () {
-                    test(_selectedMonthIndex!);
-                  },
-                  child: Text('klcik'))
             ],
           ),
         ),
