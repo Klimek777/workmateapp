@@ -1,16 +1,7 @@
 # workmateapp
 
-A new Flutter project.
+The Workmate app will help you plan visits to customers, record services and their costs, manage clients, plan services in advance, and check results such as earnings or completed orders in your company achieved in a given month. App was created using Flutter and Firebase!
+## Presentation
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![workamate_img](https://github.com/Klimek777/workmateapp/assets/90191027/1d87dd51-2aaa-466a-9505-c2d8ff962e6f)
+![workamate_img 1](https://github.com/Klimek777/workmateapp/assets/90191027/6b08b1d2-5241-4e83-aab7-297a39058699)
