@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class FirebaseService {
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -274,5 +276,20 @@ class FirebaseService {
     } catch (e) {
       return false;
     }
+  }
+
+  Future<LatLng> getCoordinatesFromAddress(String address) async {
+    try {
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        double latitude = locations.first.latitude;
+        double longitude = locations.first.longitude;
+        return LatLng(latitude, longitude);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return LatLng(0,
+        0); // Zwracanie domyślnych współrzędnych w przypadku błędu lub braku danych
   }
 }

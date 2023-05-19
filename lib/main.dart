@@ -5,6 +5,7 @@ import 'package:workmateapp/pages/addwork_page.dart';
 import 'package:workmateapp/pages/editwork_page.dart';
 import 'package:workmateapp/pages/home_page.dart';
 import 'package:workmateapp/pages/login_page.dart';
+import 'package:workmateapp/pages/maps_page.dart';
 import 'package:workmateapp/pages/profile_page.dart';
 import 'package:workmateapp/pages/register_page.dart';
 import 'package:workmateapp/pages/workdetails_page.dart';

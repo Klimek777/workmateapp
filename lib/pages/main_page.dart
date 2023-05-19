@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:workmateapp/pages/maps_page.dart';
 
 import '../services/firebase_service.dart';
 
@@ -18,10 +20,14 @@ class _MainPageState extends State<MainPage> {
   DateTime _selectedDate = DateTime.now();
   FirebaseService? _firebaseService;
 
+  List? addreses;
+  List? names;
+  List<LatLng>? coordiantes;
   @override
   void initState() {
     super.initState();
     _firebaseService = GetIt.instance.get<FirebaseService>();
+
     print(_selectedDate);
   }
 
@@ -110,7 +116,21 @@ class _MainPageState extends State<MainPage> {
           width: 60,
           height: 30,
         ),
-        onPressed: () {});
+        onPressed: () async {
+          print(addreses);
+          print(names);
+          coordiantes = await getCoordinates(addreses!);
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MapPage(
+                  coordinates: coordiantes!,
+                  names: names!,
+                  addreses: addreses!),
+            ),
+          );
+        });
   }
 
   Widget _choseDayWidget(DateTime selectedDate) {
@@ -279,6 +299,8 @@ class _MainPageState extends State<MainPage> {
                 itemBuilder: (BuildContext context, int index) {
                   Map _work = _workposts[index];
                   String documentId = snapshot.data!.docs[index].id;
+                  addreses = createFullAddressList(_workposts);
+                  names = createNameList(_workposts);
 
                   return InkWell(
                     onTap: () {
@@ -318,5 +340,44 @@ class _MainPageState extends State<MainPage> {
         },
       ),
     );
+  }
+
+  String createFullAddress(String street, String city) {
+    return '$street  $city';
+  }
+
+  List<String> createFullAddressList(List workPosts) {
+    List<String> addressList = [];
+    for (int i = 0; i < workPosts.length; i++) {
+      Map<String, dynamic> work = workPosts[i];
+      String street = work["address"];
+      String city = work["city"];
+      String fullAddress = createFullAddress(street, city);
+      addressList.add(fullAddress);
+    }
+
+    return addressList;
+  }
+
+  List<String> createNameList(List workPosts) {
+    List<String> nameList = [];
+    for (int i = 0; i < workPosts.length; i++) {
+      Map<String, dynamic> work = workPosts[i];
+      String name = work['name'];
+      nameList.add(name);
+    }
+    return nameList;
+  }
+
+  Future<List<LatLng>> getCoordinates(List addresses) async {
+    List<LatLng> coordinatesList = [];
+
+    for (int i = 0; i < addresses.length; i++) {
+      LatLng coordinates =
+          await _firebaseService!.getCoordinatesFromAddress(addresses[i]);
+      coordinatesList.add(coordinates);
+    }
+    print(coordinatesList);
+    return coordinatesList;
   }
 }

@@ -280,7 +280,7 @@ class _AddWrokState extends State<AddWrok> {
   Widget _cityTextField() {
     return TextFormField(
       decoration: const InputDecoration(
-        hintText: "City...",
+        hintText: "Zip Code + City name...",
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(width: 2, color: Colors.orange),
           borderRadius: BorderRadius.all(
