@@ -64,8 +64,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _loginForm() {
     return SizedBox(
-      height: _deviceHeight! * 0.25,
-      width: _deviceWidth! * 0.7,
+      width: _deviceWidth! * 0.8,
       child: Form(
         key: _loginFormKey,
         child: Column(
@@ -77,7 +76,10 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(
               height: 10,
             ),
-            Expanded(child: _passwordTextField()),
+            _passwordTextField(),
+            SizedBox(
+              height: 20,
+            ),
             _loginButton(),
           ],
         ),

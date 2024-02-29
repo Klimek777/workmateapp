@@ -37,6 +37,7 @@ class _MainPageState extends State<MainPage> {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orange,
         child: Icon(
           Icons.add,
           color: Colors.white,
@@ -189,7 +190,6 @@ class _MainPageState extends State<MainPage> {
         endActionPane: ActionPane(motion: ScrollMotion(), children: [
           SlidableAction(
             icon: Icons.delete,
-            label: 'delete',
             backgroundColor: Colors.black,
             borderRadius: BorderRadius.circular(30),
             onPressed: (context) async {
@@ -208,7 +208,6 @@ class _MainPageState extends State<MainPage> {
             icon: status == 'to do' ? Icons.done : Icons.close,
             backgroundColor: Colors.orange,
             borderRadius: BorderRadius.circular(30),
-            label: status == 'to do' ? 'done' : 'to do',
             onPressed: (context) async {
               String newStatus = status == 'to do' ? 'done' : 'to do';
               bool success =
@@ -226,7 +225,6 @@ class _MainPageState extends State<MainPage> {
           padding: const EdgeInsets.only(right: 8.0),
           child: Container(
             width: _deviceWidth! * 0.9,
-            height: _deviceHeight! * 0.11,
             decoration: BoxDecoration(
               color: Colors.grey[100],
               borderRadius: BorderRadius.circular(30),

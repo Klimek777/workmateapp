@@ -118,7 +118,6 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
     }
     return Container(
       width: _deviceWidth! * 0.90,
-      height: _deviceHeight! * 0.40,
       decoration: BoxDecoration(
           color: Colors.orange, borderRadius: BorderRadius.circular(40)),
       child: Column(

@@ -31,6 +31,9 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
+  pod 'GoogleMaps'
+
+
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
@@ -39,3 +42,5 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
   end
 end
+
+
