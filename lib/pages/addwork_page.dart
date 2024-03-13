@@ -328,6 +328,7 @@ class _AddWrokState extends State<AddWrok> {
 
   Widget _timeTextField() {
     return TextField(
+      key: Key("TimeKey"),
       onTap: () async {
         TimeOfDay? picked = await showTimePicker(
           context: context,
@@ -374,6 +375,7 @@ class _AddWrokState extends State<AddWrok> {
 
   Widget _dateTextField() {
     return TextField(
+      key: Key("DateKey"),
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
             context: context,
@@ -424,6 +426,7 @@ class _AddWrokState extends State<AddWrok> {
         Expanded(
           flex: 2,
           child: TextField(
+            key: Key('ProductKey'),
             controller: service.serviceNameController,
             decoration: InputDecoration(
               hintText: 'Product name',
@@ -433,6 +436,7 @@ class _AddWrokState extends State<AddWrok> {
         SizedBox(width: 10),
         Expanded(
           child: TextField(
+            key: Key("QtyKey"),
             onChanged: ((value) => _calculateFinalSum()),
             controller: service.quantityController,
             decoration: InputDecoration(
@@ -443,6 +447,7 @@ class _AddWrokState extends State<AddWrok> {
         SizedBox(width: 10),
         Expanded(
           child: TextField(
+            key: Key("PriceKey"),
             onChanged: (value) => _calculateFinalSum(),
             controller: service.priceController,
             decoration: InputDecoration(
