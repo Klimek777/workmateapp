@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_final_fields, prefer_interpolation_to_compose_strings
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -47,14 +49,10 @@ class Service {
 class _EditDeatilsPageState extends State<EditDeatilsPage> {
   FirebaseService? _firebaseService;
   final GlobalKey<FormState> _workFormKey = GlobalKey<FormState>();
-  double? _deviceHeight, _deviceWidth, _price, _totalSum;
+  double? _deviceHeight, _deviceWidth, _totalSum;
   // ignore: unused_field
   String? _name, _phone, _city, _address, _notes, _serviceName, documentId;
-  int? _q;
   TextEditingController _nameController = TextEditingController();
-  TextEditingController _serviceNameController = TextEditingController();
-  TextEditingController _quantityController = TextEditingController();
-  TextEditingController _priceController = TextEditingController();
   TextEditingController _timeController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
@@ -282,7 +280,6 @@ class _EditDeatilsPageState extends State<EditDeatilsPage> {
         ),
       ),
       onChanged: (value) {
-        final number = int.tryParse(value.replaceAll(' ', ''));
         if (value.length > 9) {
           value = value.substring(0, 9); // limit to 9 digits
         }
