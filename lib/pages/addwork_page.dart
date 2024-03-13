@@ -198,6 +198,12 @@ class _AddWrokState extends State<AddWrok> {
           ),
         ),
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a name';
+        }
+        return null;
+      },
       onSaved: (_value) {
         setState(() {
           _name = _value;
@@ -228,6 +234,12 @@ class _AddWrokState extends State<AddWrok> {
           ),
         ),
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a phone number';
+        }
+        return null;
+      },
       onChanged: (value) {
         final number = int.tryParse(value.replaceAll(' ', ''));
         if (value.length > 9) {
@@ -269,6 +281,12 @@ class _AddWrokState extends State<AddWrok> {
           ),
         ),
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter an address';
+        }
+        return null;
+      },
       onSaved: (_value) {
         setState(() {
           _address = _value;
@@ -294,6 +312,12 @@ class _AddWrokState extends State<AddWrok> {
           ),
         ),
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a city';
+        }
+        return null;
+      },
       onSaved: (_value) {
         setState(() {
           _city = _value;
@@ -554,29 +578,35 @@ class _AddWrokState extends State<AddWrok> {
   }
 
   void _postWork() async {
-    _workFormKey.currentState!.save();
-    try {
-      bool success = await _firebaseService!.postWork(
-          _name!,
-          _phone!,
-          _address!,
-          _city!,
-          _timeController.text,
-          _dateController.text,
-          _serviceList.toString(),
-          _notes,
-          _totalSum.toString(),
-          'to do');
+    if (_workFormKey.currentState!.validate()) {
+      _workFormKey.currentState!.save();
+      try {
+        bool success = await _firebaseService!.postWork(
+            _name!,
+            _phone!,
+            _address!,
+            _city!,
+            _timeController.text,
+            _dateController.text,
+            _serviceList.toString(),
+            _notes,
+            _totalSum.toString(),
+            'to do');
 
-      if (success) {
-        String documentId = _firebaseService!.getDocumentId()!;
-        print('Document added with id: $documentId');
-        Navigator.pop(context);
-      } else {
-        print('Error adding document');
+        if (success) {
+          String documentId = _firebaseService!.getDocumentId()!;
+          print('Document added with id: $documentId');
+          Navigator.pop(context);
+        } else {
+          print('Error adding document');
+        }
+      } catch (e) {
+        print(e);
       }
-    } catch (e) {
-      print(e);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Wypelnij wymagane pola!")),
+      );
     }
   }
 }

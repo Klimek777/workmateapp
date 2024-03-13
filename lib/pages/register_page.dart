@@ -157,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _registrationForm() {
     return SizedBox(
-      height: _deviceHeight! * 0.30,
+      height: _deviceHeight! * 0.35,
       width: _deviceWidth! * 0.7,
       child: Form(
         key: _registerFormKey,
@@ -224,7 +224,15 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _email!,
         password: _password!,
       );
-      if (_result) Navigator.pop(context);
+      if (_result) {
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("Uzytkownik istnieje"),
+          duration: Duration(seconds: 4),
+        ));
+      }
     }
   }
 }

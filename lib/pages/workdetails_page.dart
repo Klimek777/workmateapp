@@ -211,42 +211,42 @@ class _WorkDetailsPageState extends State<WorkDetailsPage> {
                   ),
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(100)),
-                height: 50,
-                width: 50,
-                child: InkWell(
-                  onTap: () async {
-                    String newStatus = status == 'to do' ? 'done' : 'todo';
-                    bool success = await _firebaseService!
-                        .updateStatus(documentId, newStatus);
-                    if (success) {
-                      setState(() {
-                        status = newStatus;
-                        print('staus updated for' + status);
-                      });
-                    }
-                  },
-                  child: Icon(
-                    status == 'to do' ? Icons.done : Icons.close,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(100)),
-                height: 50,
-                width: 50,
-                child: Icon(
-                  Icons.pin_drop,
-                  color: Colors.white,
-                ),
-              ),
+              // Container(
+              //   decoration: BoxDecoration(
+              //       color: Colors.black,
+              //       borderRadius: BorderRadius.circular(100)),
+              //   height: 50,
+              //   width: 50,
+              //   child: InkWell(
+              //     onTap: () async {
+              //       String newStatus = status == 'to do' ? 'done' : 'todo';
+              //       bool success = await _firebaseService!
+              //           .updateStatus(documentId, newStatus);
+              //       if (success) {
+              //         setState(() {
+              //           status = newStatus;
+              //           print('staus updated for' + status);
+              //         });
+              //       }
+              //     },
+              //     child: Icon(
+              //       status == 'to do' ? Icons.done : Icons.close,
+              //       color: Colors.white,
+              //       size: 30,
+              //     ),
+              //   ),
+              // ),
+              // Container(
+              //   decoration: BoxDecoration(
+              //       color: Colors.black,
+              //       borderRadius: BorderRadius.circular(100)),
+              //   height: 50,
+              //   width: 50,
+              //   child: Icon(
+              //     Icons.pin_drop,
+              //     color: Colors.white,
+              //   ),
+              // ),
               InkWell(
                 onTap: () async {
                   await launchUrl(Uri.parse("tel:$phone"));

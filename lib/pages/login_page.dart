@@ -188,7 +188,15 @@ class _LoginPageState extends State<LoginPage> {
 
       bool _result = await _firebaseService!
           .loginUser(email: _email!, password: _password!);
-      if (_result) Navigator.popAndPushNamed(context, 'home');
+      if (_result) {
+        Navigator.popAndPushNamed(context, 'home');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("Błędne hasło"),
+          duration: Duration(seconds: 4),
+        ));
+      }
     }
   }
 }
